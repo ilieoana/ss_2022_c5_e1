@@ -18,8 +18,9 @@ public class SecurityConfig {
         return http.httpBasic()
                 .and()
                 .authorizeRequests()
-                .anyRequest().authenticated() // endpoint level authorization
+//                .anyRequest().authenticated() // endpoint level authorization
                 // the request can be denied completely even before it reaches the controller
+                .anyRequest().permitAll()
                 .and().build();
 
         // .anyRequest().authenticated() === matcher method + authorization rule
