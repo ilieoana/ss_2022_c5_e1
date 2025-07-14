@@ -2,22 +2,29 @@ package org.example.ss_2022_c5_e1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
+@EnableWebSecurity
+@EnableWebMvc
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.httpBasic()
-                .and()
-                .authorizeRequests()
+        return http
+                .httpBasic(Customizer.withDefaults())
+//                .securityMatcher("/api/**", "/app/**") // Only works when there are multiple filter chains.
+                .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/demo").hasAuthority("read")
 //                .anyRequest().authenticated() // endpoint level authorization
                 // the request can be denied completely even before it reaches the controller
 //                .anyRequest().permitAll()
@@ -26,11 +33,13 @@ public class SecurityConfig {
 //                .anyRequest().hasAnyAuthority("read", "write")
 //                .anyRequest().hasRole("ADMIN")
 //                .anyRequest().hasAnyRole("ADMIN", "MANAGER")
-                .anyRequest().access("")
-                .and().build();
+//                .anyRequest().access("isAuthenticated() and hasAuthority('read')")
+                .anyRequest().authenticated()
+        )
+                .build();
 
         // .anyRequest().authenticated() === matcher method + authorization rule
-        // 1. which matter methods should you use and how
+        // 1. which matter methods should you use and how ( securityMatchers() with antMatcher and regexMatchers())
         // 2. how to apply different authorization rules
     }
 
